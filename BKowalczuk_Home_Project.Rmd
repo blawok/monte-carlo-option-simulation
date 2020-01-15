@@ -1,6 +1,6 @@
 ---
 title: "Put Down-and-In Option"
-author: "Bartlomiej Kowalczuk"
+author: "Bartlomiej Kowalczuk 372926"
 output: html_document
 ---
 
@@ -10,10 +10,17 @@ library(Rcpp)
 library(ggplot2)
 ```
 
-In Put Down-and-In option we want the price to decrease and reach the barrier to activate.
+***
+
+I am considering a European style down-and-in put option with a barrier active between the moment of pricing and the option expiry.
+
+In Put Down-and-In option we want the price to decrease and reach the barrier to activate, if the price does not drop to the barrier level, the option never becomes active and expires worthless. 
+
+In this simulation i set the barrier to be equal to 85 - not too small but small enough to obtain some interesting results.
 
 ### Install package and load library
 This library consists of one C++ function for Monte Carlo simulation.
+
 ```{r}
 if (!require("BKput")) install.packages("BKput.zip", type = "binaries", repos = NULL)
 
@@ -32,70 +39,67 @@ getPutPriceVol <- function(Volatility) {
    return(getPutDownAndIn(nInt = 3000, Vol = Volatility, nReps = 100))
 }
 
-# getPutPriceExpVol <- function(expiry, Volatility) {
-#    return(getPutDownAndIn(nInt = 3000, Volatility = Volatility, Expiry = expiry, nReps = 100))
-# }
-
 ```
+
+I set number of repetitions to 100 and the size of single path to 3000.
 
 First of all we want to check how the option behaves on different time to maturity levels.
 
 ```{r, fig.align='center'}
-# arguments values of values of function
-# expiry <- seq(0.01, 0.7, by = 0.001)
-# resultE <- sapply(expiry, getPutPriceExp)
-# 
-# # plot
-# qplot(x = expiry,
-#       y = resultE,
-#       xlab = "time to maturity",
-#       ylab = "Price of European put option",
-#       main = "Price of European put option vs. time to maturity",
-#       colour = I("#4E84C4")
-#       )
+expiry <- seq(0.01, 0.7, by = 0.001)
+resultE <- sapply(expiry, getPutPriceExp)
 
+df <- data.frame(expiry,resultE)
+p <- ggplot(df, aes(x=expiry, y=resultE))
+p + geom_point(color = "#00AFBB") +
+  geom_smooth(color = "green") +
+  xlab("Time to maturity") +
+  ylab("Price") 
 
 ```
 
-
-Inferring from the chart we can assume that the higher the time to maturity the higher would the price be.
+We want the price to reach the barrier, so we want the time to maturity to be as high as possible. It is a positive relation so we can say with confidence that the higher the time to maturity the higher the price can get. 
 
 Next, we will check how the option price behaves on differnet volatility levels.
 
 ```{r, fig.align='center'}
-# arguments values of values of function
-# Vol <- seq(0.1, 0.3, by = 0.001)
-# resultV <- sapply(Vol, getPutPriceVol)
-# 
-# # plot 
-# qplot(x = Vol,
-#       y = resultV,
-#       xlab = "Volatility",
-#       ylab = "Price of European put option",
-#       main = "Price of European put option vs. Volatility",
-#       colour = I("#00AFBB"))
+Vol <- seq(0.1, 0.3, by = 0.001)
+resultV <- sapply(Vol, getPutPriceVol)
+
+df <- data.frame(Vol,resultV)
+p <- ggplot(df, aes(x=Vol, y=resultV))
+p + geom_point(color = "#00AFBB") +
+  geom_smooth(color = "red") +
+  xlab("Volatility") +
+  ylab("Price")  
 
 ```
 
-We want the price to reach the barrier, so we want the volatility to be as high as possible.The relation is not constant but overall it is a rising trend. We may say that the higher the volatility the higher the price can get. 
+Inferring from the chart we can assume that the higher the volatility the higher would the price be. However, after the 0.27 mark the price based on "smooth" line falls down. The best time is when volatility is around 0.25.
 
-How would the relation look if we investigate it using both factors?
+How would the relation look if we investigate it using both factors simultaneously?
 
 ```{r, fig.align='center'}
+getPutPriceVolExp <- function(vol, exp) {
+  return(getPutDownAndIn(nInt = 3000, Vol = vol, Expiry = exp, nReps = 100))
+}
+
 Vol <- seq(0.1, 0.7, by = 0.001)
 expiry <- seq(0.1, 0.7, by = 0.001)
-
-resultV <- sapply(Vol, getPutPriceVol)
-resultE <- sapply(expiry, getPutPriceExp)
-
-# plot
-p <- qplot(x = Vol,
-      y = resultV,
-      xlab = "Volatility",
-      ylab = "Price of European put option",
-      main = "Price of European put option vs. Volatility",
-      colour = I("#00AFBB")) 
-
-p + geom_point(x = Vol, y = resultE,color='steelblue')
+result_combined <- mapply(getPutPriceVolExp,Vol,expiry)
+df <- data.frame(Vol,expiry,result_combined)
+p <- ggplot(df, aes(x=Vol, y=result_combined))
+p + geom_point() +
+  geom_smooth() +
+  xlab("Volatility / time to maturity") +
+  ylab("Price")  
 
 ```
+
+We can see a fine growing track of the price as the volatility and time to maturity rises.
+
+In conclusion we would like the option to have high volatility (around 0.25) and enough time to reach the barrier (as much time as it is possible).
+
+***
+
+*In accordance with the Honor Code, I certify that my answers here are my own work, and I did not make my solutions available to anyone else.*
