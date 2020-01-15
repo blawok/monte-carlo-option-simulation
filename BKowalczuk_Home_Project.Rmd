@@ -8,6 +8,7 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 library(Rcpp)
 library(ggplot2)
+library(devtools)
 ```
 
 ***
@@ -22,9 +23,9 @@ In this simulation i set the barrier to be equal to 85 - not too small but small
 This library consists of one C++ function for Monte Carlo simulation.
 
 ```{r}
-if (!require("BKput")) install.packages("BKput.zip", type = "binaries", repos = NULL)
+if (!require("BKput")) install_github("blawok/monte_carlo_option_simulation", subdir="BKput")
 
-library(blawok)
+library(BKput)
 
 ```
 
