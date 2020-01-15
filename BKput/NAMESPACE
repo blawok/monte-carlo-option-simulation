@@ -1,0 +1,3 @@
+useDynLib(BKput, .registration=TRUE)
+exportPattern("^[[:alpha:]]+")
+importFrom(Rcpp, evalCpp)

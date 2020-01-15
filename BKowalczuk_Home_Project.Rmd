@@ -1,0 +1,78 @@
+---
+title: "Put Down-and-In Option"
+author: "Bartlomiej Kowalczuk"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(Rcpp)
+library(ggplot2)
+# sourceCpp("put_down_and_in.cpp")
+# library(BKput)
+```
+
+In Put Down-and-In option we want the price to decrease and reach the barrier to activate.
+
+### Install package and load library
+This library consists of one C++ function for Monte Carlo simulation.
+```{r}
+if (!require("BKput")) install.packages("BKput", type = "binaries", repos = NULL)
+
+library(blawok)
+
+```
+
+```{r}
+# build an R function: option price vs. time to maturity
+getPutPriceExp <- function(expiry) {
+  return(getDownInPutPrice(Expiry = expiry, nReps = 100000))
+}
+# build an R function: option price vs. volatility
+getPutPriceVol <- function(Volatility) {
+  return(getDownInPutPrice(Expiry = Volatility, nReps = 100000))
+}
+
+```
+
+First of all we want to check how the option behaves on different time to maturity levels.
+
+```{r, fig.align='center'}
+# arguments values of values of function
+expiry <- seq(0.01, 0.7, by = 0.001)
+result <- sapply(expiry, getPutPriceExp)
+
+# plot
+qplot(x = expiry,
+      y = result,
+      xlab = "time to maturity",
+      ylab = "Price of European put option",
+      main = "Price of European put option vs. time to maturity",
+      colour = I("#4E84C4")
+      )
+
+
+```
+
+Until time maturity gets to approximately 0.13 the option price stays at 0 level. However, from about 0.13 the price starts to rise but not in a stable way. From about 0.2 the rising is stable.
+
+Inferring from the chart we 
+
+Next, we will check how the option price behaves on differnet volatility levels.
+
+```{r, fig.align='center'}
+# arguments values of values of function
+Vol <- seq(0.1, 0.4, by = 0.001)
+result <- sapply(Vol, getPutPriceVol)
+
+# plot 
+qplot(x = Vol,
+      y = result,
+      xlab = "Volatility",
+      ylab = "Price of European put option",
+      main = "Price of European put option vs. Volatility",
+      colour = I("#00AFBB"))
+
+```
+
+We want the price to reach the barrier, so we want the volatility to be as high as possible. It is obvious that the higher the volatility the higher the price can get. 
