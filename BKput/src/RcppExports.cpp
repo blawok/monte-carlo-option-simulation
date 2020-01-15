@@ -5,25 +5,26 @@
 
 using namespace Rcpp;
 
-// getDownInPutPrice
-double getDownInPutPrice(double Expiry, double Strike, double Spot, double Vol, double r, unsigned long nReps);
-RcppExport SEXP _BKput_getDownInPutPrice(SEXP ExpirySEXP, SEXP StrikeSEXP, SEXP SpotSEXP, SEXP VolSEXP, SEXP rSEXP, SEXP nRepsSEXP) {
+// getPutDownAndIn
+double getPutDownAndIn(int nInt, double Strike, double Spot, double Vol, double Rfr, double Expiry, int nReps);
+RcppExport SEXP _BKput_getPutDownAndIn(SEXP nIntSEXP, SEXP StrikeSEXP, SEXP SpotSEXP, SEXP VolSEXP, SEXP RfrSEXP, SEXP ExpirySEXP, SEXP nRepsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< double >::type Expiry(ExpirySEXP);
+    Rcpp::traits::input_parameter< int >::type nInt(nIntSEXP);
     Rcpp::traits::input_parameter< double >::type Strike(StrikeSEXP);
     Rcpp::traits::input_parameter< double >::type Spot(SpotSEXP);
     Rcpp::traits::input_parameter< double >::type Vol(VolSEXP);
-    Rcpp::traits::input_parameter< double >::type r(rSEXP);
-    Rcpp::traits::input_parameter< unsigned long >::type nReps(nRepsSEXP);
-    rcpp_result_gen = Rcpp::wrap(getDownInPutPrice(Expiry, Strike, Spot, Vol, r, nReps));
+    Rcpp::traits::input_parameter< double >::type Rfr(RfrSEXP);
+    Rcpp::traits::input_parameter< double >::type Expiry(ExpirySEXP);
+    Rcpp::traits::input_parameter< int >::type nReps(nRepsSEXP);
+    rcpp_result_gen = Rcpp::wrap(getPutDownAndIn(nInt, Strike, Spot, Vol, Rfr, Expiry, nReps));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_BKput_getDownInPutPrice", (DL_FUNC) &_BKput_getDownInPutPrice, 6},
+    {"_BKput_getPutDownAndIn", (DL_FUNC) &_BKput_getPutDownAndIn, 7},
     {NULL, NULL, 0}
 };
 
